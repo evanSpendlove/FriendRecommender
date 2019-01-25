@@ -1,6 +1,7 @@
 /* 24/1/19: Attempt 1 */
 
 #include <stdio.h>
+#include <string.h>
 
 /* 
     Defines a new structure, fb_user, in which I store 
@@ -14,8 +15,17 @@ typedef struct fb_user
     int friend_count;
 } fb_user;
 
+void input(fb_user *user_input[])
+{
+
+}
+
 int main(void)
 {
-    
+    fb_user userList[6];
+
+    input(userList[]);
+
+
     return 0;
 }

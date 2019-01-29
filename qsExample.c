@@ -23,7 +23,7 @@ int partition(fb_user users[], int min, int max)
 
     for(j = min; j <= max - 1; j++)
     {
-        if(users[j].friend_count <= pivot)
+        if(users[j].friend_count >= pivot)
         {
             small++;
             swap(&users[small], &users[j]);
@@ -54,12 +54,12 @@ int main()
     users[4].username[0] = 'E';
     users[5].username[0] = 'F';
 
-    users[0].friend_count = 6;
-    users[1].friend_count = 5;
-    users[2].friend_count = 4;
-    users[3].friend_count = 3;
-    users[4].friend_count = 2;
-    users[5].friend_count = 1;
+    users[0].friend_count = 1;
+    users[1].friend_count = 2;
+    users[2].friend_count = 3;
+    users[3].friend_count = 4;
+    users[4].friend_count = 5;
+    users[5].friend_count = 6;
 
     printf("User 1: %c\n", users[0].username[0]);
     printf("User 2: %c\n", users[1].username[0]);

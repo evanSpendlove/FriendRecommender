@@ -1,4 +1,3 @@
-#include "userStructure.h"
 #include "sorting.h"
 
 void swap(fb_user *a, fb_user *b)
@@ -11,29 +10,32 @@ void swap(fb_user *a, fb_user *b)
 
 int partition(fb_user user_List[], int min, int max)
 {
-    int pivot = user_List[max].friend_count;
-    int small = (min - 1);
-    int j;
+    int pivot = user_List[max].friend_count; /* Initialises the pivot and assigns it the final index in user_List[] array */
+    int index = (min - 1); /* Initialises index and assigns it the value of (min -1) */
+    int i; /* initialises i, a counter used for looping over the array */
 
-    for(j = min; j <= max - 1; j++)
+    /* Moves every element greater than the pivot to the left of it, so all on right are less than it */
+
+    for(i = min; i <= max - 1; i++)
     {
-        if(user_List[j].friend_count >= pivot) /* Sorts so that user with most friends first */
+        if(user_List[i].friend_count >= pivot) /* Sorts so that user with most friends first */
         {
-            small++;
-            swap(&user_List[small], &user_List[j]);
+            index++; /* increment the index of the bigger element */
+            swap(&user_List[index], &user_List[i]); /* Swaps user_List[i] and user_List[index] */
         }
     }
-    swap(&user_List[small+1], &user_List[max]);
-    return (small + 1);
+    swap(&user_List[index+1], &user_List[max]); /* Swaps the elements at indices [small + 1] and [max] */
+    return (index + 1); /* Returns the element at the location that [max] previously was */
 }
 
 void friendSort(fb_user user_List[], int min, int max)
 {
-    if(min < max)
+    if(min < max) /* Provided the min is less than the max, i.e. we loop from a lower index to a higher */
     {
-        int pi = partition(user_List, min, max);
-        friendSort(user_List, min, pi - 1);
-        friendSort(user_List, pi + 1, max);
+        int partition_index; /* Initialises partition index */
+        partition_index = partition(user_List, min, max); /* Calls the partition() function on user-List[] and assigns the result to partition_index */
+        friendSort(user_List, min, partition_index - 1); /* Calls quickSort() to sort the part of the array less than partition_index */
+        friendSort(user_List, partition_index + 1, max); /* Calls quickSort() to sort the part of the array greater than partition_index */
     }
 }
 
@@ -41,40 +43,11 @@ void alphabetise(fb_user *user_List, int total_users)
 {
     int i, j; /* Counters used for looping over the user_List[] array */
 
-    for(i=0;i<=total_users;i++) /* Looping through all users as we standardise their username capitalisation */
-    {
-        for(j=0;j<100 && user_List[i].username[j] != '\n';j++) /* Looping through all characters in each username */
-        {
-            if(j == 0) /* For the first character of each username...*/
-            {
-                if(user_List[i].username[j] >= 'a' && user_List[i].username[j] <= 'z') /* If it is a lowercase letter */
-                {
-                    user_List[i].username[j] = user_List[i].username[j] - 32; /* Make it uppercase */
-                }
-            }
-            else if (user_List[i].username[j] == ' ') /* If the character is a space */
-            {
-                ++j; /* If this character is a space, capitalise the next letter */
-                if(user_List[i].username[j] >= 'a' && user_List[i].username[j] <= 'z')
-                {
-                    user_List[i].username[j] = user_List[i].username[j] - 32;
-                }
-            }
-            else
-            {
-                if(user_List[i].username[j] >= 'A' && user_List[i].username[j] <= 'Z') /* If it is a capital letter, make it lowercase */
-                {
-                    user_List[i].username[j] = user_List[i].username[j] + 32;
-                }
-            }
-        }
-    }
-
     for(i=0;i<total_users;i++) /* Loop for alphabetising names, now that the capitalisation is standardised */
     {
         for(j=0;j<total_users;j++) /* For each user's username... */
         {
-            if(strcmp(user_List[i].username, user_List[j].username) < 0 && user_List[i].friend_count == user_List[j].friend_count) /* If they have the same number of friends, alphabetise them */
+            if(strcasecmp(user_List[i].username, user_List[j].username) < 0 && user_List[i].friend_count == user_List[j].friend_count) /* If they have the same number of friends, alphabetise them */
             {
                 swap(&user_List[i], &user_List[j]); /* Swap to alphabetise */
             }
@@ -82,41 +55,25 @@ void alphabetise(fb_user *user_List, int total_users)
     }
 }
 
-int friendSelection(fb_user user_List[], char user_select[], char friend_suggest[][100], int total_users)
+int friendSelection(fb_user user_List[], char user_select[], char friend_suggest[][MAX_CHAR_COUNT], int total_users)
 {
     int i, j; /* Counters used for looping through arrays */
-    int suggestion_count=0; /* Used for storing the number of suggestions added to friend_suggest[] */
+    int suggestion_count = 0; /* Used for storing the number of suggestions added to friend_suggest[] */
     int user_index = -1; /* Used for storing index of user selected in user_List array, default is -1 for clarity */
-    int friendMatch = 0; /* Boolean used for checking if a match was found on the user selected's friend list, or the friend_suggest list */
+    int friendMatch = 0; /* Boolean (integer) used for checking if a match was found on the user selected's friend list, or the friend_suggest list */
 
     friendSort(user_List, 0, total_users - 1); /* Quick-sort based algorithm for sorting users based on number of friends */
-    /*
-    for(i=0;i<total_users;i++)
-    {
-        printf("Username %d: %s", i, user_List[i].username);
-    }
-    */
     alphabetise(user_List, total_users - 1);
-    /*
-    for(i=0;i<total_users;i++)
-    {
-        printf("Username %d: %s", i, user_List[i].username);
-    }
-
-    printf("User Selected: %s", user_select);
-    */
-
+    
     for(i=0;i<total_users && user_index == -1;i++) /*Loops through sorted user_List[] to find the index of the user selected */
     {
         if(strcmp(user_List[i].username, user_select) == 0) /* Compares against user selected */
         {
-            printf("User Index: %d\n", user_index); /* DELETE THIS */
             user_index = i; /* Stores index of the user selected in sorted array */
-            printf("User Index: %d\n", user_index); /* DELETE THIS */
         }
     }
 
-    for(i=0;i<total_users && suggestion_count != 2; i++) /* Loops through the users to find suggestions who meeet criteria below*/
+    for(i=0;i<total_users && suggestion_count != MAX_FRIEND_SUGGEST; i++) /* Loops through the users to find suggestions who meeet criteria below*/
     {
         if(i != user_index) /* If the user in user_List is not the user selected... */
         {
@@ -140,19 +97,5 @@ int friendSelection(fb_user user_List[], char user_select[], char friend_suggest
         }
         friendMatch = 0; /* Resets friendMatch for the next iteration */
     }
-
-    printf("Suggestion Count: %d\n", suggestion_count); /* DELETE THIS */
-
-    switch(suggestion_count) /* Returns a message based on how many suggestions found */
-    {
-        case 0 : /* No user suggestions found */
-            return 0;
-        case 1 : /* One user suggestion found */
-            return 1;
-        case 2: /* Two user suggestions found */
-            return 2;
-        default: /* Error message */
-            printf("Suggestion Count: %d\n", suggestion_count); /* DELETE THIS */
-            return -1;
-    }
+    return suggestion_count; /* Returns the number of friend suggestions found */
 }

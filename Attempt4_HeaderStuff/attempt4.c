@@ -1,12 +1,18 @@
-/* 24/1/19: Attempt 4 - Using C libraries */
+/* 
+    COMP10050: Assignment 1
+    Written by: Evan Spendlove (18492656)
+*/
 
 #include <stdio.h>
 #include <string.h>
-#include "userIO.h"
 #include "userStructure.h"
-#include "userIO.c"
+#include "userIO.h"
 #include "sorting.h"
 #include "sorting.c"
+#include "userIO.c"
+#include "sortingNetwork.c"
+
+#include "sortingNetwork.h"
 
 /*
     Note on naming convention:
@@ -24,41 +30,27 @@
 
 int main(void)
 {
-    fb_user userList[30]; /* Initialises an array of thirty (4*6 + 6) users in userList */
-    int n = 6; /* Initialises n, the number of users in the array userList */
-    int totalUsers; /* Used for storing count of totalUsers */
+    fb_user userList[MAX_USERS]; /* Initialises an array of MAX_USERS (set to 6) users in userList */
+    int i; /* Counter for outputting friends found */
+    int totalUsers = 0; /* Used for storing count of totalUsers */
     int friendsFound; /* Used for keeping track of friend suggestions found */
-    char userSelect[100]; /* Used for storing the username of the user selected for friend suggestion */
-    char friendSuggest[2][100]; /* 2d Array used for storing friend suggestions by username */
+    char userSelect[MAX_CHAR_COUNT]; /* Used for storing the username of the user selected for friend suggestion */
+    char friendSuggest[MAX_FRIEND_SUGGEST][MAX_CHAR_COUNT]; /* 2d Array used for storing friend suggestions by username */
 
-    input(userList, &totalUsers, n);
-    userSelection(userList, userSelect, totalUsers);
+    input(userList, &totalUsers); /* Calls the input() function to get input from user */
+    userSelection(userList, userSelect, totalUsers); /* Calls the userSelection() function to allow user to pick a user */
 
-    printf("User Selected: %s\n", userSelect);
-
-    friendsFound = friendSelection(userList, userSelect, friendSuggest, totalUsers);
+    printf("User Selected: %s", userSelect); /* Prints the user selected */
     
-    printf("Friend Founds: %d.\n", friendsFound);
+    friendsFound = friendSelection(userList, userSelect, friendSuggest, totalUsers); /* Calls friendSelection() and assigns return value to friendsFound */
+    
+    printf("Friend Founds: %d.\n", friendsFound); /* Prints the number of friends found */
 
-    switch(friendsFound)
+    printf("There were %d friend suggestions found:\n", friendsFound);
+    for(i=0;i<friendsFound;i++)
     {
-        case 0 :
-            printf("There were no friend suggestions found for the user you have selected.\n");
-            break;
-        case 1 :
-            printf("There was one friend suggestion found for the user you have selected.\n");
-            printf("\t %s", friendSuggest[0]);
-            break;
-        case 2 :
-            printf("There were two friend suggestions found for the user you have selected.\n");
-            printf("\t 1: %s", friendSuggest[0]);
-            printf("\t 2: %s", friendSuggest[1]);
-            break;
-        default:
-            printf("Error: friendSuggestion() reported an error message.\n");
-            break;
+        printf("\t %d: %s", i+1, friendSuggest[i]);
     }
-
 
     return 0;
 }

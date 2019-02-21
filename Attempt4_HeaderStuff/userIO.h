@@ -7,16 +7,16 @@
 #include "userStructure.h"
 
 /* 
-    input Function:
+    input() Function:
     Goal: take input from the user, store it in userList array from main and keep a count of total users
     It stores the input in the userList array using pointers.
     It also keeps a count of the total number of users
     and stores it in the totalUsers variable using pointers.
 */
-void input(fb_user userList[], int *totalUsers, int n);
+void input(fb_user userList[], int *totalUsers);
 
 /*
-    userSelection Function:
+    userSelection() Function:
     Goal: To output a list of users with appropriate keys to the user as a prompt for selection.
         - Outputs a list of users as a prompt.
         - Takes user selection.
